@@ -1,0 +1,43 @@
+{
+  "LSTMModel": {
+    "layers": [
+      {
+        "LSTM": {
+          "return_sequences": true,
+          "units": 256
+        }
+      },
+      {
+        "Dropout": {
+          "rate": 0.3
+        }
+      },
+      {
+        "LSTM": {
+          "return_sequences": true,
+          "units": 512
+        }
+      },
+      {
+        "Dropout": {
+          "rate": 0.3
+        }
+      },
+      {
+        "LSTM": {
+          "units": 256
+        }
+      },
+      {
+        "Dense": {
+          "units": 256
+        }
+      },
+      {
+        "Dropout": {
+          "rate": 0.3
+        }
+      }
+    ]
+  }
+}

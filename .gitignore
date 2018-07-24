@@ -1,0 +1,15 @@
+# IntelliJ IDEA Project Directory - ignore from being checked into git
+.idea/
+audio-classification.iml
+
+# Python compilation by-products
+*.pyc
+
+# Log files
+*.log
+
+# Vi editor restore files
+*.swp
+
+# Mac stuff
+.DS_Store

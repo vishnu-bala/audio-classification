@@ -2,6 +2,9 @@ import json
 import glob
 import os
 import time
+
+import errno
+
 from audio_train_eval import train_and_eval_from_config
 
 from os.path import basename
@@ -18,7 +21,11 @@ def make_dir_if_not_exists(time_str, cc_path, cc_index, mc_path):
     full_dir_path = os.path.join(cwd, 'model_output_dir', dir_path)
     print('full_dir_path: {}'.format(full_dir_path))
     if not os.path.exists(full_dir_path):
-        os.mkdir(full_dir_path)
+        try:
+            os.makedirs(full_dir_path)
+        except OSError as err:
+            if err.errno != errno.EEXIST:
+                raise
     return full_dir_path
 
 

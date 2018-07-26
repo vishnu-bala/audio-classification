@@ -1,4 +1,6 @@
 import tensorflow as tf
+from tensorflow import logging
+
 import utils
 
 
@@ -209,7 +211,8 @@ class YT8MFrameFeatureReader(BaseReader):
           A tuple of video indexes, video features, labels, and padding data.
         """
         reader = tf.TFRecordReader()
-        _, serialized_example = reader.read(filename_queue)
+        filename, serialized_example = reader.read(filename_queue)
+        logging.info("The tfrecord just read from the file: " + filename)
 
         return self.prepare_serialized_examples(serialized_example,
                                                 max_quantized_value, min_quantized_value)

@@ -1,5 +1,5 @@
 {
-  "AudioCNNModel": {
+  "CNNModel": {
     "layers": [
       {
         "Conv2D": {

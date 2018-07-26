@@ -3,7 +3,7 @@ from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Input
 from keras import Model
 
 
-class AudioCNNModel:
+class CNNModel:
     def __init__(self):
         pass
 
@@ -52,9 +52,5 @@ class AudioCNNModel:
                 x = globals()[class_name](**kwargs)(x)
 
         outputs = Dense(common_config['num_classes'], activation='softmax', name='vggish_fc2')(x)
-        # outputs = Dense(10, activation='softmax', name='vggish_fc2')(x)
-
-        # model.compile(loss='categorical_crossentropy', optimizer='adadelta', metrics=['accuracy'])
-        # return tf.keras.Model(inputs, outputs)
         model = Model(inputs=inputs, outputs=outputs)
         return model

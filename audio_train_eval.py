@@ -55,8 +55,8 @@ LSTM_DEFAULT_CONFIG = {
     }
 }
 
-AUDIO_CNN_DEFAULT_CONFIG = {
-    "AudioCNNModel": {
+CNN_DEFAULT_CONFIG = {
+    "CNNModel": {
         "layers": [
             {
                 "Conv2D": {
@@ -204,7 +204,9 @@ class EvaluateInputTensor(Callback):
         self.verbose = verbose
         self.metrics_prefix = metrics_prefix
 
-    def on_epoch_end(self, epoch, logs={}):
+    def on_epoch_end(self, epoch, logs=None):
+        if logs is None:
+            logs = {}
         self.val_model.set_weights(self.model.get_weights())
         results = self.val_model.evaluate(None, None, steps=int(self.num_steps),
                                           verbose=self.verbose)
@@ -389,7 +391,7 @@ def train_and_eval(training_data_path, evaluation_data_path, batch_size, num_rea
     if model_name == 'LSTMModel':
         mc = LSTM_DEFAULT_CONFIG
     else:
-        mc = AUDIO_CNN_DEFAULT_CONFIG
+        mc = CNN_DEFAULT_CONFIG
 
     train_and_eval_from_config(cc, mc, model_output_dir)
 

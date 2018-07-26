@@ -343,13 +343,15 @@ def train_and_eval_from_config(common_config, model_config, model_output_dir):
     # sess.run(tf.global_variables_initializer())
     # Fit the model using data from the TFRecord data tensors.
     coord = tf.train.Coordinator()
-    threads = tf.train.start_queue_runners(sess, coord)
+    threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
-    # TODO we may have to change the steps_per_epoch here if the training
-    # TODO and validation accuracies aren't good..
-    train_model.fit(epochs=common_config['num_epochs'],
-                    steps_per_epoch=common_config['training_steps_per_epoch'],
-                    callbacks=[EvaluateInputTensor(eval_model, steps=common_config['eval_steps_per_epoch'])])
+    try:
+        while not coord.should_stop():
+            train_model.fit(epochs=common_config['num_epochs'],
+                            steps_per_epoch=common_config['training_steps_per_epoch'],
+                            callbacks=[EvaluateInputTensor(eval_model, steps=common_config['eval_steps_per_epoch'])])
+    except tf.errors.OutOfRangeError:
+        logging.info("Done training -- epoch limit reached.")
 
     # save the model
     # 1. serialize model to JSON

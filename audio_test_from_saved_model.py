@@ -74,7 +74,7 @@ def test_from_saved_model(test_data_path, batch_size, num_readers,
                                             steps=100,
                                             verbose=1)
     except tf.errors.OutOfRangeError:
-        logging.info("Done training -- epoch limit reached.")
+        logging.info("Done training -- limit reached.")
 
     # Clean up the TF session.
     coord.request_stop()

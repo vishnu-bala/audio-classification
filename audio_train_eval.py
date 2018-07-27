@@ -309,8 +309,7 @@ def train_and_eval_from_config(common_config, model_config, model_output_dir):
             reader,
             common_config['evaluation_data_path'],
             batch_size=common_config['batch_size'],
-            num_readers=common_config['num_readers'],
-            num_epochs=common_config['num_epochs']))
+            num_readers=common_config['num_readers']))
     tf.summary.histogram("eval/model_input_raw", eval_model_input_raw)
 
     feature_dim = len(eval_model_input_raw.get_shape()) - 1
@@ -340,7 +339,7 @@ def train_and_eval_from_config(common_config, model_config, model_output_dir):
     sess = K.get_session()
 
     sess.run(tf.local_variables_initializer())
-    # sess.run(tf.global_variables_initializer())
+    sess.run(tf.global_variables_initializer())
     # Fit the model using data from the TFRecord data tensors.
     coord = tf.train.Coordinator()
     threads = tf.train.start_queue_runners(sess=sess, coord=coord)

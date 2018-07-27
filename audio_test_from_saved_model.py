@@ -1,4 +1,5 @@
 import tensorflow as tf
+from tensorflow import logging
 from keras.engine.saving import model_from_json
 from tensorflow.python.platform import flags
 from tensorflow.python.platform.flags import FLAGS
@@ -27,8 +28,7 @@ def test_from_saved_model(test_data_path, batch_size, num_readers,
             reader,
             test_data_path,
             batch_size=batch_size,
-            num_readers=num_readers,
-            num_epochs=num_epochs))
+            num_readers=num_readers))
     tf.summary.histogram("test/model_input_raw", test_model_input_raw)
 
     feature_dim = len(test_model_input_raw.get_shape()) - 1
@@ -62,15 +62,19 @@ def test_from_saved_model(test_data_path, batch_size, num_readers,
     test_model.summary()
 
     sess.run(tf.local_variables_initializer())
-    sess.run(tf.global_variables_initializer())
+    # sess.run(tf.global_variables_initializer())
     # evaluate the model using test data from the TFRecord data tensors.
     coord = tf.train.Coordinator()
     threads = tf.train.start_queue_runners(sess, coord)
 
-    loss, acc = test_model.evaluate(test_model_input_raw,
-                                    test_labels_batch,
-                                    steps=100,
-                                    verbose=1)
+    try:
+        while not coord.should_stop():
+            loss, acc = test_model.evaluate(test_model_input_raw,
+                                            test_labels_batch,
+                                            steps=100,
+                                            verbose=1)
+    except tf.errors.OutOfRangeError:
+        logging.info("Done training -- epoch limit reached.")
 
     # Clean up the TF session.
     coord.request_stop()

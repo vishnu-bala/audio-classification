@@ -51,8 +51,7 @@ def dequantize(feat_vector, max_quantized_value=2, min_quantized_value=-2):
 def get_input_evaluation_tensors(reader,
                                  data_pattern,
                                  batch_size=1024,
-                                 num_readers=1,
-                                 num_epochs=1):
+                                 num_readers=1):
     """
     Creates the evaluation data tensors by reading the eval data in tfrecord files
 
@@ -77,8 +76,7 @@ def get_input_evaluation_tensors(reader,
         if not files:
             raise IOError("Unable to find the evaluation files.")
         logging.info("number of evaluation files: " + str(len(files)))
-        filename_queue = tf.train.string_input_producer(
-            files, shuffle=False, num_epochs=num_epochs)
+        filename_queue = tf.train.string_input_producer(files, shuffle=False)
         eval_data = [
             reader.prepare_reader(filename_queue) for _ in range(num_readers)
             ]
@@ -160,8 +158,7 @@ def get_reader(feature_names, feature_sizes, num_classes, frame_features):
 def get_input_test_tensors(reader,
                            data_pattern,
                            batch_size=1024,
-                           num_readers=1,
-                           num_epochs=1):
+                           num_readers=1):
     """
     Creates the test data tensors by reading the test data in tfrecord files
 
@@ -186,8 +183,7 @@ def get_input_test_tensors(reader,
         if not files:
             raise IOError("Unable to find the test files.")
         logging.info("number of test files: " + str(len(files)))
-        filename_queue = tf.train.string_input_producer(
-            files, shuffle=False, num_epochs=num_epochs)
+        filename_queue = tf.train.string_input_producer(files, shuffle=False)
         test_data = [
             reader.prepare_reader(filename_queue) for _ in range(num_readers)
             ]

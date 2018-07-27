@@ -208,8 +208,12 @@ class EvaluateInputTensor(Callback):
         if logs is None:
             logs = {}
         self.val_model.set_weights(self.model.get_weights())
-        results = self.val_model.evaluate(None, None, steps=int(self.num_steps),
-                                          verbose=self.verbose)
+        try:
+            results = self.val_model.evaluate(None, None, steps=int(self.num_steps),
+                                              verbose=self.verbose)
+        except tf.errors.OutOfRangeError:
+            logging.info("Done evaluating -- no more eval data for this epoch")
+
         metrics_str = '\n'
         for result, name in zip(results, self.val_model.metrics_names):
             metric_name = self.metrics_prefix + '_' + name
@@ -345,10 +349,9 @@ def train_and_eval_from_config(common_config, model_config, model_output_dir):
     threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
     try:
-        while not coord.should_stop():
-            train_model.fit(epochs=common_config['num_epochs'],
-                            steps_per_epoch=common_config['training_steps_per_epoch'],
-                            callbacks=[EvaluateInputTensor(eval_model, steps=common_config['eval_steps_per_epoch'])])
+        train_model.fit(epochs=common_config['num_epochs'],
+                        steps_per_epoch=common_config['training_steps_per_epoch'],
+                        callbacks=[EvaluateInputTensor(eval_model, steps=common_config['eval_steps_per_epoch'])])
     except tf.errors.OutOfRangeError:
         logging.info("Done training -- epoch limit reached.")
 

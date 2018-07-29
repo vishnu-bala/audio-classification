@@ -440,8 +440,8 @@ if __name__ == '__main__':
         "in models package")
     flags.DEFINE_string("model_output_dir", "./model_output_dir/",
                         "The directory to save the model files in.")
-    flags.DEFINE_string("feature_names", "mean_rgb", "Name of the feature "
-                                                     "to use for training.")
+    flags.DEFINE_string("feature_names", "audio_embedding", "Name of the feature "
+                                                            "to use for training.")
 
     # Other unused (for now) flags..
     flags.DEFINE_string("label_loss", "CrossEntropyLoss",

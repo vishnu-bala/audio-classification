@@ -153,9 +153,16 @@ def read_and_convert(tfrecord_data_path, feature_names, feature_sizes, num_class
                 print('Context:')
                 print('video_id: {}'.format(video_id))
                 print('label: {}'.format(label))
+                # These are identified as labels containing water samples
+                # 288, 293, 370, 371, 372, 56
+                if label[0][0][56] == 1 or label[0][0][288] == 1 or label[0][0][293] == 1 \
+                        or label[0][0][370] == 1 or label[0][0][371] == 1 or label[0][0][372] == 1:
+                    print('Water sample found. video id: {}'.format(video_id))
+                else:
+                    print('Non-water sample found. video id: {}'.format(video_id))
                 # print feature lists
-                print('\nFeature Lists:')
-                print('audio_feature_matrix: {}'.format(audio_feature_matrix))
+                # print('\nFeature Lists:')
+                # print('audio_feature_matrix: {}'.format(audio_feature_matrix))
         except tf.errors.OutOfRangeError:
             print("Done reading tfrecords")
 

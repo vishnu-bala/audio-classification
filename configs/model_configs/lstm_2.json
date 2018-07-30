@@ -4,7 +4,7 @@
       {
         "LSTM": {
           "return_sequences": true,
-          "units": 512
+          "units": 64
         }
       },
       {
@@ -15,7 +15,7 @@
       {
         "LSTM": {
           "return_sequences": true,
-          "units": 1024
+          "units": 128
         }
       },
       {
@@ -25,7 +25,7 @@
       },
       {
         "LSTM": {
-          "units": 1024
+          "units": 128
         }
       },
       {

@@ -14,20 +14,6 @@ class MLPModel:
         layers = model_config[model_name]['layers']
 
         x = None
-        # x = Flatten()(inputs)
-        # x = Dense(4096)(x)
-        # x = BatchNormalization()(x)
-        # x = Activation(activation='relu')(x)
-        # x = Dropout(0.5)(x)
-        # x = Dense(2048)(x)
-        # x = BatchNormalization()(x)
-        # x = Activation('relu')(x)
-        # x = Dropout(0.5)(x)
-        # x = Dense(1026)(x)
-        # x = BatchNormalization()(x)
-        # x = Activation('relu')(x)
-        # x = Dropout(0.3)(x)
-
         for layer_index, layer in enumerate(layers):
             class_name = next(iter(layer))
 

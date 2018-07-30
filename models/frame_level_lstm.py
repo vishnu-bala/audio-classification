@@ -17,14 +17,6 @@ class LSTMModel:
         layers = model_config[model_name]['layers']
 
         x = None
-        # x = LSTM(256, return_sequences=True)(inputs)
-        # x = Dropout(0.3)(x)
-        # x = LSTM(512, return_sequences=True)(x)
-        # x = Dropout(0.3)(x)
-        # x = LSTM(256)(x)
-        # x = Dense(256)(x)
-        # x = Dropout(0.3)(x)
-
         for layer_index, layer in enumerate(layers):
             class_name = next(iter(layer))
 

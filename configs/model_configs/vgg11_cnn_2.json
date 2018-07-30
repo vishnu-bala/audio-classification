@@ -94,6 +94,34 @@
         }
       },
       {
+        "Conv2D": {
+          "filters": 512,
+          "kernel_size": 3,
+          "strides": 1,
+          "activation": "relu",
+          "padding": "same",
+          "name": "conv3/conv5_1"
+        }
+      },
+      {
+        "Conv2D": {
+          "filters": 512,
+          "kernel_size": 3,
+          "strides": 1,
+          "activation": "relu",
+          "padding": "same",
+          "name": "conv3/conv5_2"
+        }
+      },
+      {
+        "MaxPooling2D": {
+          "pool_size": 2,
+          "strides": 2,
+          "padding": "same",
+          "name": "pool5"
+        }
+      },
+      {
         "Flatten": {
           "name": "flatten_"
         }

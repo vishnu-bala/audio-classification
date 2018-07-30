@@ -139,6 +139,13 @@
           "activation": "relu",
           "name": "vggish_fc1/fc1_2"
         }
+      },
+      {
+        "Dense": {
+          "units": 1000,
+          "activation": "relu",
+          "name": "vggish_fc1/fc1_3"
+        }
       }
     ]
   }

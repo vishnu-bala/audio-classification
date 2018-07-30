@@ -242,20 +242,7 @@ def train_and_eval_from_config(common_config, model_config, model_output_dir):
                         common_config['feature_sizes'],
                         common_config['num_classes'],
                         common_config['frame_features'])
-    #
-    # if common_config['frame_features']:
-    #     serialized_examples = tf.placeholder(tf.string, shape=(None,))
-    #
-    #     fn = lambda x: build_prediction_graph(x, reader)
-    #     model_input_raw, labels_batch, num_frames = (
-    #         tf.map_fn(fn, serialized_examples,
-    #                   dtype=(tf.float32, tf.bool, tf.int32)))
-    # else:
-    #     serialized_examples = tf.placeholder(tf.string, shape=(None,))
-    #
-    #     model_input_raw, labels_batch, num_frames = (
-    #         build_prediction_graph(serialized_examples, reader))
-    #
+
     # get the input data tensors
     unused_video_id, model_input_raw, labels_batch, num_frames = (
         get_input_data_tensors(
@@ -267,17 +254,6 @@ def train_and_eval_from_config(common_config, model_config, model_output_dir):
         ))
 
     tf.summary.histogram("model/input_raw", model_input_raw)
-
-    # TODO
-    feature_dim = len(model_input_raw.get_shape()) - 1
-    model_input_raw = tf.nn.l2_normalize(model_input_raw, feature_dim)
-
-    # reshape model_input_raw and labels_batch to fit as the input to keras model
-    # TODO see if we need this line..
-    # model_input_raw = tf.reshape(model_input_raw, shape=(batch_size, 1, 300, 128))
-
-    # TODO see if we need this line..
-    labels_batch = tf.cast(labels_batch, tf.float32)
 
     # create model
     model_name = next(iter(model_config))
@@ -294,40 +270,20 @@ def train_and_eval_from_config(common_config, model_config, model_output_dir):
                         target_tensors=[labels_batch])
     train_model.summary()
 
-    # create a separate evaluation model
-    # if common_config['frame_features']:
-    #     serialized_examples = tf.placeholder(tf.string, shape=(None,))
-    #
-    #     fn = lambda x: build_prediction_graph(x, reader)
-    #     model_input_raw, labels_batch, num_frames = (
-    #         tf.map_fn(fn, serialized_examples,
-    #                   dtype=(tf.float32, tf.bool, tf.int32)))
-    # else:
-    #     serialized_examples = tf.placeholder(tf.string, shape=(None,))
-    #
-    #     model_input_raw, labels_batch, num_frames = (
-    #         build_prediction_graph(serialized_examples, reader))
-
+    # get the evaluation data tensors
     video_id_batch, eval_model_input_raw, eval_labels_batch, eval_num_frames = (
         get_input_evaluation_tensors(
             reader,
             common_config['evaluation_data_path'],
             batch_size=common_config['batch_size'],
             num_readers=common_config['num_readers']))
+
     tf.summary.histogram("eval/model_input_raw", eval_model_input_raw)
 
-    feature_dim = len(eval_model_input_raw.get_shape()) - 1
-
-    # Normalize input features.
-    eval_model_input_raw = tf.nn.l2_normalize(eval_model_input_raw, feature_dim)
-
-    # reshape model_input_raw and labels_batch to fit as the input to keras model
-
-    # TODO see if we need these 2 lines..
-    eval_labels_batch = tf.cast(eval_labels_batch, tf.float32)
-    # eval_labels_batch = tf.one_hot(eval_labels_batch, num_classes)
-    # create model
-    eval_model = ModelFactory().get_model(model_name).create_model(eval_model_input_raw, common_config, model_config)
+    # create a separate model for evaluation
+    eval_model = ModelFactory().get_model(model_name).create_model(eval_model_input_raw,
+                                                                   common_config,
+                                                                   model_config)
 
     # compile the eval model
     # Pass the target tensor `eval_labels_batch` to eval_model.compile

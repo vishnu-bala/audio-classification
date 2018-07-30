@@ -234,7 +234,10 @@ class YT8MFrameFeatureReader(BaseReader):
         labels = (tf.cast(
             tf.sparse_to_dense(contexts["labels"].values, (self.num_classes,), 1,
                                validate_indices=False),
-            tf.bool))
+            tf.float32))
+
+        # Keep this commented out, just wanted to see what the labels are
+        # labels = tf.Print(labels, [labels], "labels tensor values")
 
         # loads (potentially) different types of features and concatenates them
         num_features = len(self.feature_names)
@@ -265,6 +268,13 @@ class YT8MFrameFeatureReader(BaseReader):
 
         # concatenate different features
         video_matrix = tf.concat(feature_matrices, 1)
+
+        # Normalize input features on feature dimensions axis, that is, in a [1][300][128] tensor
+        feature_dim = len(video_matrix.get_shape()) - 1
+        video_matrix = tf.nn.l2_normalize(video_matrix, feature_dim)
+
+        # Keep this commented out, just wanted to see the video_matrix tensors picked up properly
+        # video_matrix = tf.Print(video_matrix, [video_matrix], "video matrix tensor values")
 
         # convert to batch format.
         batch_video_ids = tf.expand_dims(contexts["video_id"], 0)

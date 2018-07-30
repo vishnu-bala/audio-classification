@@ -124,7 +124,6 @@ def get_input_data_tensors(reader,
         training_data = [
             reader.prepare_reader(filename_queue) for _ in range(num_readers)
             ]
-
         return tf.train.shuffle_batch_join(
             training_data,
             batch_size=batch_size,

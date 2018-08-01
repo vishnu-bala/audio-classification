@@ -195,7 +195,7 @@ class EvaluateInputTensor(Callback):
             Ignored with the default value of `None`.
     """
 
-    def __init__(self, model, steps, metrics_prefix='val', verbose=1):
+    def __init__(self, model, steps, metrics_prefix='val', verbose=2):
         # parameter of callbacks passed during initialization
         # pass evaluation mode directly
         super(EvaluateInputTensor, self).__init__()
@@ -307,7 +307,8 @@ def train_and_eval_from_config(common_config, model_config, model_output_dir):
     try:
         train_model.fit(epochs=common_config['num_epochs'],
                         steps_per_epoch=common_config['training_steps_per_epoch'],
-                        callbacks=[EvaluateInputTensor(eval_model, steps=common_config['eval_steps_per_epoch'])])
+                        callbacks=[EvaluateInputTensor(eval_model, steps=common_config['eval_steps_per_epoch'])],
+                        verbose=2)
     except tf.errors.OutOfRangeError:
         logging.info("Done training -- epoch limit reached.")
 

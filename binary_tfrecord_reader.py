@@ -62,20 +62,26 @@ def get_audio_feature_matrix(features,
       feature_matrix: matrix of all frame-features
       num_frames: number of frames in the sequence
     """
-    decoded_features = tf.reshape(
-        tf.cast(tf.decode_raw(features, tf.uint8), tf.float32),
-        [-1, feature_size])
+    decoded_features = tf.decode_raw(features, tf.uint8)
+    # decoded_features = tf.Print(decoded_features, [decoded_features], "decoded features values: ")
+    decoded_features_cast = tf.cast(decoded_features, tf.float32)
+    # decoded_features_cast = tf.Print(decoded_features_cast, [decoded_features_cast], "decoded feature after
+    # casting: ")
 
-    num_frames = tf.minimum(tf.shape(decoded_features)[0], max_frames)
-    feature_matrix = utils.dequantize(decoded_features,
+    decoded_features_reshape = tf.reshape(decoded_features_cast, [-1, feature_size])
+    # decoded_features_reshape = tf.Print(decoded_features_reshape, [decoded_features_reshape], "decoded reshaped
+    # values: ")
+
+    num_frames = tf.minimum(tf.shape(decoded_features_reshape)[0], max_frames)
+    feature_matrix = utils.dequantize(decoded_features_reshape,
                                       max_quantized_value,
                                       min_quantized_value)
     feature_matrix = resize_axis(feature_matrix, 0, max_frames)
     return feature_matrix, num_frames
 
 
-def read_and_convert(tfrecord_data_path, feature_names, feature_sizes, max_frames=300,
-                     max_quantized_value=2, min_quantized_value=-2):
+def read_and_print(tfrecord_data_path, feature_names, feature_sizes, max_frames=300,
+                   max_quantized_value=2, min_quantized_value=-2):
     # grab the tensorflow session
     with tf.Session() as sess:
         list_of_feature_names = [
@@ -89,10 +95,6 @@ def read_and_convert(tfrecord_data_path, feature_names, feature_sizes, max_frame
                           tfrecord_data_path + "'.")
         logging.info("Number of training files: %s.", str(len(files)))
         filename_queue = tf.train.string_input_producer(files, num_epochs=1, shuffle=False)
-
-        # training_data = [
-        #     reader.prepare_reader(filename_queue) for _ in range(num_readers)
-        # ]
 
         reader = tf.TFRecordReader()
         filename, serialized_example = reader.read(filename_queue)
@@ -112,7 +114,7 @@ def read_and_convert(tfrecord_data_path, feature_names, feature_sizes, max_frame
         #     tf.sparse_to_dense(contexts["labels"].values, (1, 1), 1,
         #                        validate_indices=False),
         #     tf.int32))
-        labels = tf.cast(contexts["labels"], tf.int32)
+        labels = tf.convert_to_tensor(tf.cast(contexts["labels"], tf.int32))
 
         num_features = len(list_of_feature_names)
 
@@ -131,6 +133,7 @@ def read_and_convert(tfrecord_data_path, feature_names, feature_sizes, max_frame
         # concatenate different features
         audio_matrices = tf.concat(feature_matrices, 1)
 
+        # TODO maybe, we shouldn't do the expand_dims for all the tensors?
         batch_video_ids, batch_audio_matrices, batch_labels = tf.train.shuffle_batch(
             [tf.expand_dims(contexts["video_id"], 0), tf.expand_dims(audio_matrices, 0), tf.expand_dims(labels, 0)],
             batch_size=1, capacity=1 * 3, num_threads=1, min_after_dequeue=1)
@@ -147,6 +150,7 @@ def read_and_convert(tfrecord_data_path, feature_names, feature_sizes, max_frame
         try:
             while not coord.should_stop():
                 video_id, audio_feature_matrix, label = sess.run([batch_video_ids, batch_audio_matrices, batch_labels])
+
                 count_tfrecord = count_tfrecord + 1
                 # print the count of tfrecord
                 print('TFRecord count: {}'.format(count_tfrecord))
@@ -156,13 +160,15 @@ def read_and_convert(tfrecord_data_path, feature_names, feature_sizes, max_frame
                 print('label: {}'.format(label))
                 # These are identified as labels containing water samples
                 # 288, 293, 370, 371, 372, 56
-                if label[0] == 1:
+                if label == 1:
                     print('Water sample found. video id: {}'.format(video_id))
                 else:
                     print('Non-water sample found. video id: {}'.format(video_id))
                 # print feature lists
-                # print('\nFeature Lists:')
-                # print('audio_feature_matrix: {}'.format(audio_feature_matrix))
+                print('\nFeature Lists:')
+                import numpy
+                numpy.set_printoptions(threshold=numpy.nan)
+                print('audio_matrices : {}'.format(audio_feature_matrix))
         except tf.errors.OutOfRangeError:
             print("Done reading tfrecords")
 
@@ -182,4 +188,4 @@ if __name__ == '__main__':
                                                             "to use for training.")
     flags.DEFINE_string("feature_sizes", "128", "Length of the feature vectors.")
 
-    read_and_convert(FLAGS.tfrecord_data_path, FLAGS.feature_names, FLAGS.feature_sizes)
+    read_and_print(FLAGS.tfrecord_data_path, FLAGS.feature_names, FLAGS.feature_sizes)

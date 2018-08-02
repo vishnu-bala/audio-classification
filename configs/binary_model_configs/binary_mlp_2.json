@@ -7,45 +7,64 @@
       },
       {
         "Dense": {
-          "units": 8192
-        }
-      },
-      {
-        "BatchNormalization": {
-        }
-      },
-      {
-        "Activation": {
-          "activation": "relu"
-        }
-      },
-      {
-        "Dropout": {
-          "rate": 0.5
-        }
-      },
-      {
-        "Dense": {
-          "units": 4096
-        }
-      },
-      {
-        "BatchNormalization": {
-        }
-      },
-      {
-        "Activation": {
-          "activation": "relu"
-        }
-      },
-      {
-        "Dropout": {
-          "rate": 0.5
-        }
-      },
-      {
-        "Dense": {
           "units": 2048
+        }
+      },
+      {
+        "BatchNormalization": {
+        }
+      },
+      {
+        "Activation": {
+          "activation": "relu"
+        }
+      },
+      {
+        "Dropout": {
+          "rate": 0.5
+        }
+      },
+      {
+        "Dense": {
+          "units": 1024
+        }
+      },
+      {
+        "BatchNormalization": {
+        }
+      },
+      {
+        "Activation": {
+          "activation": "relu"
+        }
+      },
+      {
+        "Dropout": {
+          "rate": 0.5
+        }
+      },
+      {
+        "Dense": {
+          "units": 512
+        }
+      },
+      {
+        "BatchNormalization": {
+        }
+      },
+      {
+        "Activation": {
+          "activation": "relu"
+        }
+      },
+      {
+        "Dropout": {
+          "rate": 0.3
+        }
+      }
+      {
+        "Dense": {
+          "units": 256
         }
       },
       {

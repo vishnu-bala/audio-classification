@@ -62,6 +62,25 @@
           "rate": 0.3
         }
       }
+      {
+        "Dense": {
+          "units": 512
+        }
+      },
+      {
+        "BatchNormalization": {
+        }
+      },
+      {
+        "Activation": {
+          "activation": "relu"
+        }
+      },
+      {
+        "Dropout": {
+          "rate": 0.3
+        }
+      }
     ]
   }
 }

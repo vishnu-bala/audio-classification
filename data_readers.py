@@ -240,7 +240,7 @@ class YT8MFrameFeatureReader(BaseReader):
             tf.float32))
 
         # Keep this commented out, just wanted to see what the labels are
-        labels = tf.Print(labels, [labels], "labels tensor values")
+        # labels = tf.Print(labels, [labels], "labels tensor values")
 
         # loads (potentially) different types of features and concatenates them
         num_features = len(self.feature_names)
@@ -277,7 +277,7 @@ class YT8MFrameFeatureReader(BaseReader):
         audio_matrix = tf.nn.l2_normalize(audio_matrix, feature_dim)
 
         # Keep this commented out, just wanted to see the audio_matrix tensors picked up properly
-        audio_matrix = tf.Print(audio_matrix, [audio_matrix], "video matrix tensor values")
+        # audio_matrix = tf.Print(audio_matrix, [audio_matrix], "video matrix tensor values")
 
         # convert to batch format.
         batch_video_ids = tf.expand_dims(contexts["video_id"], 0)

@@ -159,7 +159,7 @@ def read_and_convert(tfrecord_data_path, feature_names, feature_sizes, num_class
                 # print('Context:')
                 # print('video_id: {}'.format(video_id))
                 # print('label: {}'.format(label))
-                indices_of_classes_present = np.where(label == 1)[0]
+                indices_of_classes_present = np.where(label == 1)[2]
                 if any(x in indices_of_water_classes for x in indices_of_classes_present):
                     count_water_samples = count_water_samples + 1
                 else:

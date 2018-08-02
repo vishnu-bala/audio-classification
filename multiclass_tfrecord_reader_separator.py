@@ -1,3 +1,4 @@
+import numpy as np
 import tensorflow as tf
 from tensorflow import gfile, flags, logging
 from tensorflow.python.platform.flags import FLAGS
@@ -130,9 +131,9 @@ def read_and_convert(tfrecord_data_path, feature_names, feature_sizes, num_class
         # concatenate different features
         audio_matrices = tf.concat(feature_matrices, 1)
 
-        batch_video_ids, batch_audio_matrices, batch_labels = tf.train.shuffle_batch(
+        batch_video_ids, batch_audio_matrices, batch_labels = tf.train.batch(
             [tf.expand_dims(contexts["video_id"], 0), tf.expand_dims(audio_matrices, 0), tf.expand_dims(labels, 0)],
-            batch_size=1, capacity=1 * 3, num_threads=1, min_after_dequeue=1)
+            batch_size=1, capacity=1 * 3, num_threads=1)
 
         sess.run(tf.local_variables_initializer())
         sess.run(tf.global_variables_initializer())
@@ -142,30 +143,39 @@ def read_and_convert(tfrecord_data_path, feature_names, feature_sizes, num_class
         threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
         count_tfrecord = 0
+        count_water_samples = 0
+        count_non_water_samples = 0
+        # indices representing water related classes..
+        # These are identified as labels containing water samples
+        # 288 - 297, 370 - 372, 374, 444 - 446, 448 - 456
+        indices_of_water_classes = {288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 370, 371, 372, 374, 444,
+                                    445, 446, 448, 449, 450, 451, 452, 453, 454, 455, 456}
         # Run the tensorflow session to read from the tfrecord files..
         try:
             while not coord.should_stop():
                 video_id, audio_feature_matrix, label = sess.run([batch_video_ids, batch_audio_matrices, batch_labels])
                 count_tfrecord = count_tfrecord + 1
-                # print the count of tfrecord
-                print('TFRecord count: {}'.format(count_tfrecord))
                 # print context
-                print('Context:')
-                print('video_id: {}'.format(video_id))
-                print('label: {}'.format(label))
-                # These are identified as labels containing water samples
-                # 288, 293, 370, 371, 372, 56
-                if label[0][0][56] == 1 or label[0][0][288] == 1 or label[0][0][293] == 1 \
-                        or label[0][0][370] == 1 or label[0][0][371] == 1 or label[0][0][372] == 1:
-                    print('Water sample found. video id: {}'.format(video_id))
+                # print('Context:')
+                # print('video_id: {}'.format(video_id))
+                # print('label: {}'.format(label))
+                indices_of_classes_present = np.where(label == 1)[0]
+                if any(x in indices_of_water_classes for x in indices_of_classes_present):
+                    count_water_samples = count_water_samples + 1
                 else:
-                    print('Non-water sample found. video id: {}'.format(video_id))
+                    count_non_water_samples = count_non_water_samples + 1
                 # print feature lists
                 # print('\nFeature Lists:')
+                # import numpy
+                # numpy.set_printoptions(threshold=numpy.nan)
                 # print('audio_feature_matrix: {}'.format(audio_feature_matrix))
         except tf.errors.OutOfRangeError:
             print("Done reading tfrecords")
 
+        # print the count of tfrecord
+        print('TFRecord count: {}'.format(count_tfrecord))
+        print('Total count of water samples: {}'.format(count_water_samples))
+        print('Total count of non-water samples: {}'.format(count_non_water_samples))
         # request to stop the threads
         coord.request_stop()
         # wait for the threads to stop

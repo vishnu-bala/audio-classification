@@ -75,8 +75,21 @@ def get_audio_feature_matrix(features,
     return feature_matrix, num_frames
 
 
-def read_and_convert(tfrecord_data_path, feature_names, feature_sizes, num_classes, max_frames=300,
-                     max_quantized_value=2, min_quantized_value=-2):
+def read_and_return_stats(tfrecord_data_path, feature_names, feature_sizes, num_classes, max_frames=300,
+                          max_quantized_value=2, min_quantized_value=-2):
+    """
+    This reads all the tfrecord files in a given directory and provides stats as to how many number of
+    total tfrecords, in that how many are water samples and non-water samples.
+
+    :param tfrecord_data_path:
+    :param feature_names:
+    :param feature_sizes:
+    :param num_classes:
+    :param max_frames:
+    :param max_quantized_value:
+    :param min_quantized_value:
+    :return:
+    """
     # grab the tensorflow session
     with tf.Session() as sess:
         list_of_feature_names = [
@@ -181,6 +194,7 @@ def read_and_convert(tfrecord_data_path, feature_names, feature_sizes, num_class
         # wait for the threads to stop
         coord.join(threads)
         sess.close()
+        return count_tfrecord, count_water_samples, count_non_water_samples
 
 
 if __name__ == '__main__':
@@ -196,4 +210,4 @@ if __name__ == '__main__':
     flags.DEFINE_string("feature_sizes", "128", "Length of the feature vectors.")
     flags.DEFINE_integer("num_classes", 527, "Number of classes in dataset.")
 
-    read_and_convert(FLAGS.tfrecord_data_path, FLAGS.feature_names, FLAGS.feature_sizes, FLAGS.num_classes)
+    read_and_return_stats(FLAGS.tfrecord_data_path, FLAGS.feature_names, FLAGS.feature_sizes, FLAGS.num_classes)

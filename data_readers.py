@@ -165,7 +165,7 @@ class YT8MFrameFeatureReader(BaseReader):
         self.max_frames = max_frames
 
     @staticmethod
-    def get_video_matrix(features,
+    def get_audio_matrix(features,
                          feature_size,
                          max_frames,
                          max_quantized_value,
@@ -231,13 +231,16 @@ class YT8MFrameFeatureReader(BaseReader):
                 })
 
         # read ground truth labels
+        # if self.num_classes == 1:
+        #     labels = tf.cast(contexts["labels"], tf.float32)
+        # else:
         labels = (tf.cast(
             tf.sparse_to_dense(contexts["labels"].values, (self.num_classes,), 1,
                                validate_indices=False),
             tf.float32))
 
         # Keep this commented out, just wanted to see what the labels are
-        # labels = tf.Print(labels, [labels], "labels tensor values")
+        labels = tf.Print(labels, [labels], "labels tensor values")
 
         # loads (potentially) different types of features and concatenates them
         num_features = len(self.feature_names)
@@ -250,7 +253,7 @@ class YT8MFrameFeatureReader(BaseReader):
         num_frames = -1  # the number of frames in the video
         feature_matrices = [None] * num_features  # an array of different features
         for feature_index in range(num_features):
-            feature_matrix, num_frames_in_this_feature = self.get_video_matrix(
+            feature_matrix, num_frames_in_this_feature = self.get_audio_matrix(
                 features[self.feature_names[feature_index]],
                 self.feature_sizes[feature_index],
                 self.max_frames,
@@ -267,19 +270,19 @@ class YT8MFrameFeatureReader(BaseReader):
         num_frames = tf.minimum(num_frames, self.max_frames)
 
         # concatenate different features
-        video_matrix = tf.concat(feature_matrices, 1)
+        audio_matrix = tf.concat(feature_matrices, 1)
 
         # Normalize input features on feature dimensions axis, that is, in a [1][300][128] tensor
-        feature_dim = len(video_matrix.get_shape()) - 1
-        video_matrix = tf.nn.l2_normalize(video_matrix, feature_dim)
+        feature_dim = len(audio_matrix.get_shape()) - 1
+        audio_matrix = tf.nn.l2_normalize(audio_matrix, feature_dim)
 
-        # Keep this commented out, just wanted to see the video_matrix tensors picked up properly
-        # video_matrix = tf.Print(video_matrix, [video_matrix], "video matrix tensor values")
+        # Keep this commented out, just wanted to see the audio_matrix tensors picked up properly
+        audio_matrix = tf.Print(audio_matrix, [audio_matrix], "video matrix tensor values")
 
         # convert to batch format.
         batch_video_ids = tf.expand_dims(contexts["video_id"], 0)
-        batch_video_matrix = tf.expand_dims(video_matrix, 0)
+        batch_audio_matrix = tf.expand_dims(audio_matrix, 0)
         batch_labels = tf.expand_dims(labels, 0)
         batch_frames = tf.expand_dims(num_frames, 0)
 
-        return batch_video_ids, batch_video_matrix, batch_labels, batch_frames
+        return batch_video_ids, batch_audio_matrix, batch_labels, batch_frames

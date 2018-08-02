@@ -88,11 +88,11 @@ def get_input_evaluation_tensors(reader,
             enqueue_many=True)
 
 
-def get_input_data_tensors(reader,
-                           data_pattern,
-                           batch_size=1024,
-                           num_epochs=None,
-                           num_readers=1):
+def get_input_training_tensors(reader,
+                               data_pattern,
+                               batch_size=1024,
+                               num_epochs=None,
+                               num_readers=1):
     """
     Creates the input data tensors by reading the training data in tfrecord files
 

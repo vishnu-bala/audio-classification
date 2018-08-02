@@ -1,0 +1,43 @@
+{
+  "BinaryLSTMModel": {
+    "layers": [
+      {
+        "LSTM": {
+          "return_sequences": true,
+          "units": 32
+        }
+      },
+      {
+        "Dropout": {
+          "rate": 0.3
+        }
+      },
+      {
+        "LSTM": {
+          "return_sequences": true,
+          "units": 64
+        }
+      },
+      {
+        "Dropout": {
+          "rate": 0.3
+        }
+      },
+      {
+        "LSTM": {
+          "units": 64
+        }
+      },
+      {
+        "Dense": {
+          "units": 256
+        }
+      },
+      {
+        "Dropout": {
+          "rate": 0.3
+        }
+      }
+    ]
+  }
+}

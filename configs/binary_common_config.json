@@ -6,13 +6,13 @@
     "training_steps_per_epoch": 1000,
     "eval_steps_per_epoch": 1000,
     "batch_size": 512,
-    "num_classes": 527,
+    "num_classes": 1,
     "feature_names": "audio_embedding",
     "feature_sizes": "128",
     "frame_features": true,
     "learning_rate_decay_examples": 400000,
     "num_readers": 8,
-    "classifier": "multiclass"
+    "classifier": "binary"
   },
   {
     "training_data_path": "C:/Users/vishn/USC/audioset_v1_embeddings/bal_train/*.tfrecord",
@@ -21,13 +21,13 @@
     "training_steps_per_epoch": 500,
     "eval_steps_per_epoch": 500,
     "batch_size": 512,
-    "num_classes": 527,
+    "num_classes": 1,
     "feature_names": "audio_embedding",
     "feature_sizes": "128",
     "frame_features": true,
     "learning_rate_decay_examples": 400000,
     "num_readers": 8,
-    "classifier": "multiclass"
+    "classifier": "binary"
   },
   {
     "training_data_path": "C:/Users/vishn/USC/audioset_v1_embeddings/bal_train/*.tfrecord",
@@ -36,13 +36,13 @@
     "training_steps_per_epoch": 250,
     "eval_steps_per_epoch": 250,
     "batch_size": 512,
-    "num_classes": 527,
+    "num_classes": 1,
     "feature_names": "audio_embedding",
     "feature_sizes": "128",
     "frame_features": true,
     "learning_rate_decay_examples": 400000,
     "num_readers": 8,
-    "classifier": "multiclass"
+    "classifier": "binary"
   },
   {
     "training_data_path": "C:/Users/vishn/USC/audioset_v1_embeddings/bal_train/*.tfrecord",
@@ -51,13 +51,13 @@
     "training_steps_per_epoch": 100,
     "eval_steps_per_epoch": 100,
     "batch_size": 512,
-    "num_classes": 527,
+    "num_classes": 1,
     "feature_names": "audio_embedding",
     "feature_sizes": "128",
     "frame_features": true,
     "learning_rate_decay_examples": 400000,
     "num_readers": 8,
-    "classifier": "multiclass"
+    "classifier": "binary"
   }
 ]
 

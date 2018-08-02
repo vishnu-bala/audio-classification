@@ -1,0 +1,67 @@
+{
+  "BinaryMLPModel": {
+    "layers": [
+      {
+        "Flatten": {
+        }
+      },
+      {
+        "Dense": {
+          "units": 8192
+        }
+      },
+      {
+        "BatchNormalization": {
+        }
+      },
+      {
+        "Activation": {
+          "activation": "relu"
+        }
+      },
+      {
+        "Dropout": {
+          "rate": 0.5
+        }
+      },
+      {
+        "Dense": {
+          "units": 4096
+        }
+      },
+      {
+        "BatchNormalization": {
+        }
+      },
+      {
+        "Activation": {
+          "activation": "relu"
+        }
+      },
+      {
+        "Dropout": {
+          "rate": 0.5
+        }
+      },
+      {
+        "Dense": {
+          "units": 2048
+        }
+      },
+      {
+        "BatchNormalization": {
+        }
+      },
+      {
+        "Activation": {
+          "activation": "relu"
+        }
+      },
+      {
+        "Dropout": {
+          "rate": 0.3
+        }
+      }
+    ]
+  }
+}

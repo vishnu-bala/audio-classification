@@ -6,7 +6,7 @@ from tensorflow.python.platform import flags
 from tensorflow.python.platform.flags import FLAGS
 
 from models.model_factory import ModelFactory
-from utils import get_input_evaluation_tensors, get_input_data_tensors, get_reader
+from utils import get_input_evaluation_tensors, get_input_training_tensors, get_reader
 
 OUTPUT_MODEL_FILENAME = 'model.json'
 OUTPUT_WEIGHTS_FILENAME = 'weights.h5'
@@ -225,12 +225,6 @@ class EvaluateInputTensor(Callback):
             print(metrics_str)
 
 
-# def build_prediction_graph(serialized_examples, reader):
-#     video_id, model_input_raw, labels_batch, num_frames = (
-#         reader.prepare_serialized_examples(serialized_examples))
-#     return model_input_raw, labels_batch, num_frames
-#
-
 def train_and_eval_from_config(common_config, model_config, model_output_dir):
     # for reproducibility
     tf.set_random_seed(0)
@@ -245,7 +239,7 @@ def train_and_eval_from_config(common_config, model_config, model_output_dir):
 
     # get the input data tensors
     unused_video_id, model_input_raw, labels_batch, num_frames = (
-        get_input_data_tensors(
+        get_input_training_tensors(
             reader,
             common_config['training_data_path'],
             batch_size=common_config['batch_size'],
@@ -264,10 +258,17 @@ def train_and_eval_from_config(common_config, model_config, model_output_dir):
     # compile the model
     # Pass the target tensor `labels_batch` to train_model.compile
     # via the `target_tensors` keyword argument
-    train_model.compile(optimizer='adam',
-                        loss='categorical_crossentropy',
-                        metrics=['accuracy'],
-                        target_tensors=[labels_batch])
+    classifier = common_config['classifier']
+    if classifier == 'multiclass':
+        train_model.compile(optimizer='adam',
+                            loss='categorical_crossentropy',
+                            metrics=['accuracy'],
+                            target_tensors=[labels_batch])
+    elif classifier == 'binary':
+        train_model.compile(optimizer='adam',
+                            loss='binary_crossentropy',
+                            metrics=['accuracy'],
+                            target_tensors=[labels_batch])
     train_model.summary()
 
     # get the evaluation data tensors
@@ -278,7 +279,7 @@ def train_and_eval_from_config(common_config, model_config, model_output_dir):
             batch_size=common_config['batch_size'],
             num_readers=common_config['num_readers']))
 
-    tf.summary.histogram("eval/model_input_raw", eval_model_input_raw)
+    tf.summary.histogram("eval/input_raw", eval_model_input_raw)
 
     # create a separate model for evaluation
     eval_model = ModelFactory().get_model(model_name).create_model(eval_model_input_raw,
@@ -288,10 +289,16 @@ def train_and_eval_from_config(common_config, model_config, model_output_dir):
     # compile the eval model
     # Pass the target tensor `eval_labels_batch` to eval_model.compile
     # via the `target_tensors` keyword argument
-    eval_model.compile(optimizer='adam',
-                       loss='categorical_crossentropy',
-                       metrics=['accuracy'],
-                       target_tensors=[eval_labels_batch])
+    if classifier == 'multiclass':
+        eval_model.compile(optimizer='adam',
+                           loss='categorical_crossentropy',
+                           metrics=['accuracy'],
+                           target_tensors=[eval_labels_batch])
+    elif classifier == 'binary':
+        eval_model.compile(optimizer='adam',
+                           loss='binary_crossentropy',
+                           metrics=['accuracy'],
+                           target_tensors=[eval_labels_batch])
     eval_model.summary()
 
     # get the session..

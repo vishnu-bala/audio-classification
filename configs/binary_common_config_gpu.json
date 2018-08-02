@@ -6,13 +6,13 @@
     "training_steps_per_epoch": 1600,
     "eval_steps_per_epoch": 100,
     "batch_size": 512,
-    "num_classes": 527,
+    "num_classes": 1,
     "feature_names": "audio_embedding",
     "feature_sizes": "128",
     "frame_features": true,
     "learning_rate_decay_examples": 400000,
     "num_readers": 8,
-    "classifier": "multiclass"
+    "classifier": "binary"
   }
 ]
 

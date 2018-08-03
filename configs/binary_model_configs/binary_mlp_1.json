@@ -61,7 +61,7 @@
         "Dropout": {
           "rate": 0.3
         }
-      }
+      },
       {
         "Dense": {
           "units": 512

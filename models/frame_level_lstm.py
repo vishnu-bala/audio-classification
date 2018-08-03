@@ -60,7 +60,6 @@ class BinaryLSTMModel:
             else:
                 x = globals()[class_name](**kwargs)(x)
 
-        x = Dense(1)(x)
-        outputs = Activation('sigmoid')(x)
+        outputs = Dense(1, activation='sigmoid')(x)
         model = Model(inputs=inputs, outputs=outputs)
         return model

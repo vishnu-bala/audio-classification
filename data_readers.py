@@ -220,27 +220,39 @@ class YT8MFrameFeatureReader(BaseReader):
     def prepare_serialized_examples(self, serialized_example,
                                     max_quantized_value=2, min_quantized_value=-2):
 
-        contexts, features = tf.parse_single_sequence_example(
-            serialized_example,
-            context_features={"video_id": tf.FixedLenFeature(
-                [], tf.string),
-                "labels": tf.VarLenFeature(tf.int64)},
-            sequence_features={
-                feature_name: tf.FixedLenSequenceFeature([], dtype=tf.string)
-                for feature_name in self.feature_names
+        if self.num_classes == 1:
+            contexts, features = tf.parse_single_sequence_example(
+                serialized_example,
+                context_features={"video_id": tf.FixedLenFeature(
+                    [], tf.string),
+                    "labels": tf.FixedLenFeature([], tf.int64)},
+                sequence_features={
+                    feature_name: tf.FixedLenSequenceFeature([], dtype=tf.string)
+                    for feature_name in self.feature_names
                 })
-
-        # read ground truth labels
-        # if self.num_classes == 1:
-        #     labels = tf.cast(contexts["labels"], tf.float32)
-        # else:
-        labels = (tf.cast(
-            tf.sparse_to_dense(contexts["labels"].values, (self.num_classes,), 1,
-                               validate_indices=False),
-            tf.float32))
+            # read ground truth labels
+            # labels = tf.cast(contexts["labels"], tf.int32)
+            labels = (tf.cast(
+                tf.sparse_to_dense(contexts["labels"], (1,), 1),
+                tf.float32))
+        else:
+            contexts, features = tf.parse_single_sequence_example(
+                serialized_example,
+                context_features={"video_id": tf.FixedLenFeature(
+                    [], tf.string),
+                    "labels": tf.VarLenFeature(tf.int64)},
+                sequence_features={
+                    feature_name: tf.FixedLenSequenceFeature([], dtype=tf.string)
+                    for feature_name in self.feature_names
+                })
+            # read ground truth labels
+            labels = (tf.cast(
+                tf.sparse_to_dense(contexts["labels"].values, (self.num_classes,), 1,
+                                   validate_indices=False),
+                tf.float32))
 
         # Keep this commented out, just wanted to see what the labels are
-        # labels = tf.Print(labels, [labels], "labels tensor values")
+        # labels = tf.Print(labels, [labels], "labels tensor values: ")
 
         # loads (potentially) different types of features and concatenates them
         num_features = len(self.feature_names)

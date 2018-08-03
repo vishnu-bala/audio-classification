@@ -231,10 +231,11 @@ class YT8MFrameFeatureReader(BaseReader):
                     for feature_name in self.feature_names
                 })
             # read ground truth labels
-            # labels = tf.cast(contexts["labels"], tf.int32)
-            labels = (tf.cast(
-                tf.sparse_to_dense(contexts["labels"], (1,), 1),
-                tf.float32))
+            # For binary_crossentropy the labels shape should be [batch_size, 1]
+            # The batch_size will be added later in the expand_dims, but the [,1]
+            # should be set here. Hence the [] around the label value (since label
+            # is a scalar value of either 1 or 0)
+            labels = [tf.cast(contexts["labels"], tf.float32)]
         else:
             contexts, features = tf.parse_single_sequence_example(
                 serialized_example,

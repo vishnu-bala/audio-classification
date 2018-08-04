@@ -1,9 +1,9 @@
 [
   {
-    "training_data_path": "/home/administrator/vishnu/USC_internship/combined_bal_unbal/*.tfrecord",
-    "evaluation_data_path": "/home/administrator/vishnu/USC_internship/eval/*.tfrecord",
-    "num_epochs": 20,
-    "training_steps_per_epoch": 1600,
+    "training_data_path": "/home/administrator/vishnu/USC_internship/binary_combined_bal_unbal/*.tfrecord",
+    "evaluation_data_path": "/home/administrator/vishnu/USC_internship/binary_eval/*.tfrecord",
+    "num_epochs": 15,
+    "training_steps_per_epoch": 300,
     "eval_steps_per_epoch": 100,
     "batch_size": 512,
     "num_classes": 1,

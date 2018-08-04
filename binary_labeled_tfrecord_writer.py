@@ -50,7 +50,7 @@ def get_features_and_labels(feature_names, input_tfrecord_data_path, num_classes
 
 
 def read_and_convert_water_samples(input_tfrecord_data_path, binary_tfrecord_data_dir,
-                     feature_names, num_classes, water_samples):
+                                   feature_names, num_classes, water_samples):
     """
     The 2 functions (water_samples and non_water_samples) are needed because TFRecordWriter
     does not allow appending to an existing *.tfrecord file.
@@ -106,8 +106,15 @@ def read_and_convert_water_samples(input_tfrecord_data_path, binary_tfrecord_dat
 
                         if not os.path.exists(water_file_to_save):
                             writer = tf.python_io.TFRecordWriter(water_file_to_save)
-
-                        print('Created new water sample tfrecord file: {}'.format(water_file_to_save))
+                            print('Created new water sample tfrecord file: {}'.format(water_file_to_save))
+                        else:
+                            # handle the case where the program is killed and restarted and the file is half written
+                            # we don't want to overwrite in that case.. and TFRecordWriter doesn't have append
+                            # capability either..
+                            water_filename = 'water_{}_{}.tfrecord'.format(water_file_suffix, 'x')
+                            water_file_to_save = os.path.join(binary_tfrecord_data_dir, water_filename)
+                            writer = tf.python_io.TFRecordWriter(water_file_to_save)
+                            print('Created new water sample tfrecord file: {}'.format(water_file_to_save))
 
                     # label as 1 for water samples
                     water_label = 1
@@ -150,7 +157,7 @@ def read_and_convert_water_samples(input_tfrecord_data_path, binary_tfrecord_dat
 
 
 def read_and_convert_non_water_samples(input_tfrecord_data_path, binary_tfrecord_data_dir,
-                                   feature_names, num_classes, non_water_samples):
+                                       feature_names, num_classes, non_water_samples):
     """
     The 2 functions (water_samples and non_water_samples) are needed because TFRecordWriter
     does not allow appending to an existing *.tfrecord file.
@@ -206,8 +213,15 @@ def read_and_convert_non_water_samples(input_tfrecord_data_path, binary_tfrecord
 
                         if not os.path.exists(non_water_file_to_save):
                             writer = tf.python_io.TFRecordWriter(non_water_file_to_save)
-
-                        print('Created new non-water sample tfrecord file: {}'.format(non_water_file_to_save))
+                            print('Created new non-water sample tfrecord file: {}'.format(non_water_file_to_save))
+                        else:
+                            # handle the case where the program is killed and restarted and the file is half written
+                            # we don't want to overwrite in that case.. and TFRecordWriter doesn't have append
+                            # capability either..
+                            non_water_filename = 'non_water_{}_{}.tfrecord'.format(non_water_file_suffix, 'x')
+                            non_water_file_to_save = os.path.join(binary_tfrecord_data_dir, non_water_filename)
+                            writer = tf.python_io.TFRecordWriter(non_water_file_to_save)
+                            print('Created new non-water sample tfrecord file: {}'.format(non_water_file_to_save))
 
                     # label as 0 for non-water samples
                     non_water_label = 0
@@ -249,7 +263,9 @@ def read_and_convert_non_water_samples(input_tfrecord_data_path, binary_tfrecord
 
 
 def main(input_tfrecord_data_path, binary_tfrecord_data_dir,
-         feature_names, feature_sizes, num_classes, water_samples=-1, non_water_samples=-1):
+         feature_names, feature_sizes, num_classes,
+         water_samples=-1, non_water_samples=-1,
+         create_water_tfrecords=False, create_non_water_tfrecords=False):
     # create output dir if it does not exist
     if not os.path.exists(binary_tfrecord_data_dir):
         try:
@@ -263,13 +279,22 @@ def main(input_tfrecord_data_path, binary_tfrecord_data_dir,
                                                                         feature_names,
                                                                         feature_sizes,
                                                                         num_classes)
-    required_samples = min(water_samples, non_water_samples)
+        required_samples = min(water_samples, non_water_samples)
+    elif water_samples != -1 and non_water_samples == -1:
+        required_samples = water_samples
+    elif water_samples == -1 and non_water_samples != -1:
+        required_samples = non_water_samples
+    else:
+        required_samples = min(water_samples, non_water_samples)
+
     # create water samples' tfrecords
-    read_and_convert_water_samples(input_tfrecord_data_path, binary_tfrecord_data_dir,
-                                   feature_names, num_classes, required_samples)
-    # create non-water samples' tfrecords
-    read_and_convert_non_water_samples(input_tfrecord_data_path, binary_tfrecord_data_dir,
+    if create_water_tfrecords:
+        read_and_convert_water_samples(input_tfrecord_data_path, binary_tfrecord_data_dir,
                                        feature_names, num_classes, required_samples)
+    # create non-water samples' tfrecords
+    if create_non_water_tfrecords:
+        read_and_convert_non_water_samples(input_tfrecord_data_path, binary_tfrecord_data_dir,
+                                           feature_names, num_classes, required_samples)
 
 
 if __name__ == '__main__':
@@ -287,7 +312,12 @@ if __name__ == '__main__':
     flags.DEFINE_integer("num_classes", 527, "Number of classes in dataset.")
     flags.DEFINE_integer("water_samples", -1, "Number of water samples in dataset.")
     flags.DEFINE_integer("non_water_samples", -1, "Number of non-water samples in dataset.")
+    flags.DEFINE_bool("create_water_tfrecords", False, "Boolean to specify if water sample "
+                                                       "tfrecord files need to be created or not.")
+    flags.DEFINE_bool("create_non_water_tfrecords", False, "Boolean to specify if non-water sample tfrecord files "
+                                                           "need to be created or not")
 
     main(FLAGS.input_tfrecord_data_path, FLAGS.binary_tfrecord_data_dir,
-                     FLAGS.feature_names, FLAGS.feature_sizes, FLAGS.num_classes,
-                     FLAGS.water_samples, FLAGS.non_water_samples)
+         FLAGS.feature_names, FLAGS.feature_sizes, FLAGS.num_classes,
+         FLAGS.water_samples, FLAGS.non_water_samples,
+         FLAGS.create_water_tfrecords, FLAGS.create_non_water_tfrecords)

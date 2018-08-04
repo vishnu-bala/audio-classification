@@ -104,7 +104,6 @@ def read_and_convert_water_samples(input_tfrecord_data_path, binary_tfrecord_dat
                     # every 256th record, create a new *.tfrecord file
                     if (count_water_samples % 256) == 0:
                         water_file_suffix = count_water_samples / 256
-                        start_file_index = start_file_index - water_file_suffix
                         water_filename = 'water_{}.tfrecord'.format(start_file_index)
                         water_file_to_save = os.path.join(binary_tfrecord_data_dir, water_filename)
 
@@ -115,10 +114,12 @@ def read_and_convert_water_samples(input_tfrecord_data_path, binary_tfrecord_dat
                             # handle the case where the program is killed and restarted and the file is half written
                             # we don't want to overwrite in that case.. and TFRecordWriter doesn't have append
                             # capability either..
-                            water_filename = 'water_{}_{}.tfrecord'.format(water_file_suffix, 'x')
+                            water_filename = 'water_{}_{}.tfrecord'.format(start_file_index, 'x')
                             water_file_to_save = os.path.join(binary_tfrecord_data_dir, water_filename)
                             writer = tf.python_io.TFRecordWriter(water_file_to_save)
                             print('Created new water sample tfrecord file: {}'.format(water_file_to_save))
+
+                        start_file_index = start_file_index - 1
 
                     # label as 1 for water samples
                     water_label = 1
@@ -214,7 +215,6 @@ def read_and_convert_non_water_samples(input_tfrecord_data_path, binary_tfrecord
                     # every 256th record, create a new *.tfrecord file
                     if (count_non_water_samples % 256) == 0:
                         non_water_file_suffix = count_non_water_samples / 256
-                        start_file_index = start_file_index - non_water_file_suffix
                         non_water_filename = 'non_water_{}.tfrecord'.format(start_file_index)
                         non_water_file_to_save = os.path.join(binary_tfrecord_data_dir, non_water_filename)
 
@@ -225,10 +225,11 @@ def read_and_convert_non_water_samples(input_tfrecord_data_path, binary_tfrecord
                             # handle the case where the program is killed and restarted and the file is half written
                             # we don't want to overwrite in that case.. and TFRecordWriter doesn't have append
                             # capability either..
-                            non_water_filename = 'non_water_{}_{}.tfrecord'.format(non_water_file_suffix, 'x')
+                            non_water_filename = 'non_water_{}_{}.tfrecord'.format(start_file_index, 'x')
                             non_water_file_to_save = os.path.join(binary_tfrecord_data_dir, non_water_filename)
                             writer = tf.python_io.TFRecordWriter(non_water_file_to_save)
                             print('Created new non-water sample tfrecord file: {}'.format(non_water_file_to_save))
+                        start_file_index = start_file_index - 1
 
                     # label as 0 for non-water samples
                     non_water_label = 0
